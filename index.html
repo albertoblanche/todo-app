@@ -5,366 +5,434 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mis Tareas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Google+Sans+Text:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg:        #F5F2EB;
-    --surface:   #FDFBF7;
-    --ink:       #1A1714;
-    --ink-light: #6B6560;
-    --border:    #D8D2C8;
-    --todo:      #1A1714;
-    --progress:  #9B5E28;
-    --done:      #3A6B3E;
-    --todo-bg:   #F0EDE6;
-    --prog-bg:   #FBF0E6;
-    --done-bg:   #EAF2EB;
-    --accent:    #C4742A;
-  }
+:root {
+  --bg:           #F8F9FA;
+  --surface:      #FFFFFF;
+  --on-surface:   #202124;
+  --secondary:    #5F6368;
+  --border:       #E8EAED;
+  --hover:        #F1F3F4;
+  --blue:         #1A73E8;
+  --blue-light:   #E8F0FE;
+  --blue-text:    #1557B0;
+  --orange:       #E37400;
+  --orange-light: #FEF3E2;
+  --orange-text:  #B06000;
+  --green:        #188038;
+  --green-light:  #E6F4EA;
+  --green-text:   #116329;
+  --red:          #D93025;
+  --red-light:    #FCE8E6;
+  --red-text:     #A50E0E;
+  --radius:       8px;
+  --shadow:       0 1px 3px rgba(60,64,67,.12), 0 1px 2px rgba(60,64,67,.10);
+  --shadow-hover: 0 2px 6px rgba(60,64,67,.16), 0 1px 4px rgba(60,64,67,.12);
+}
 
-  body {
-    font-family: 'DM Mono', monospace;
-    background: var(--bg);
-    color: var(--ink);
-    min-height: 100vh;
-    padding: 40px 20px 80px;
-  }
+body {
+  font-family: 'Google Sans Text', 'Google Sans', sans-serif;
+  background: var(--bg);
+  color: var(--on-surface);
+  min-height: 100vh;
+  padding: 0 0 80px;
+}
 
-  header {
-    max-width: 900px;
-    margin: 0 auto 48px;
-    border-bottom: 1.5px solid var(--ink);
-    padding-bottom: 20px;
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
+/* Top bar */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
 
-  h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: clamp(2rem, 5vw, 3.2rem);
-    letter-spacing: -0.02em;
-    line-height: 1;
-  }
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-  .task-count {
-    font-size: 0.75rem;
-    color: var(--ink-light);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
+.app-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--blue);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-  /* Input */
-  .add-form {
-    max-width: 900px;
-    margin: 0 auto 48px;
-    display: flex;
-    gap: 10px;
-    align-items: stretch;
-  }
+.app-icon svg { width: 18px; height: 18px; fill: white; }
 
-  .add-form input {
-    flex: 1;
-    padding: 12px 16px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.9rem;
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: 4px;
-    color: var(--ink);
-    outline: none;
-    transition: border-color 0.15s;
-  }
+h1 {
+  font-family: 'Google Sans', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--on-surface);
+}
 
-  .add-form input:focus { border-color: var(--ink); }
-  .add-form input::placeholder { color: var(--ink-light); }
+.task-count {
+  font-size: 0.8125rem;
+  color: var(--secondary);
+  background: var(--hover);
+  padding: 3px 10px;
+  border-radius: 12px;
+}
 
-  .add-form button {
-    padding: 12px 20px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.85rem;
-    font-weight: 500;
-    background: var(--ink);
-    color: var(--bg);
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    white-space: nowrap;
-    letter-spacing: 0.04em;
-    transition: opacity 0.15s;
-  }
+/* Main */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
 
-  .add-form button:hover { opacity: 0.8; }
+/* Add form */
+.add-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 8px 8px 8px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 36px;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
 
-  .priority-select {
-    padding: 12px 10px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.85rem;
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: 4px;
-    color: var(--ink);
-    outline: none;
-    cursor: pointer;
-    width: 68px;
-    transition: border-color 0.15s;
-  }
-  .priority-select:focus { border-color: var(--ink); }
+.add-form:focus-within {
+  box-shadow: var(--shadow-hover);
+  border-color: var(--blue);
+}
 
-  /* Priority badge on card */
-  .priority-pip {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    border-radius: 3px;
-    font-size: 0.7rem;
-    font-weight: 500;
-    flex-shrink: 0;
-    margin-right: 8px;
-    vertical-align: middle;
-  }
-  .p-high   { background: #FDECEA; color: #B03020; border: 1px solid #F0B8B0; }
-  .p-mid    { background: #FBF0E6; color: #9B5E28; border: 1px solid #E0C4A0; }
-  .p-low    { background: #EAF2EB; color: #3A6B3E; border: 1px solid #B8D8BA; }
+.add-form input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: 'Google Sans Text', sans-serif;
+  font-size: 0.9375rem;
+  color: var(--on-surface);
+  background: transparent;
+  min-width: 0;
+}
 
-  .card-top {
-    display: flex;
-    align-items: flex-start;
-    gap: 0;
-  }
+.add-form input::placeholder { color: #9AA0A6; }
 
-  .card-text {
-    font-size: 0.85rem;
-    line-height: 1.5;
-    color: var(--ink);
-    padding-right: 28px;
-    word-break: break-word;
-    flex: 1;
-  }
+.form-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  flex-shrink: 0;
+}
 
-  /* priority changer inside card */
-  .pri-change {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 8px;
-  }
-  .pri-change label {
-    font-size: 0.65rem;
-    color: var(--ink-light);
-    letter-spacing: 0.06em;
-  }
-  .pri-change select {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    border: 1px solid var(--border);
-    background: transparent;
-    border-radius: 3px;
-    padding: 2px 4px;
-    color: var(--ink);
-    cursor: pointer;
-    outline: none;
-  }
+.priority-select {
+  font-family: 'Google Sans Text', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--secondary);
+  border: none;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  padding: 4px 2px;
+  min-width: 52px;
+}
 
-  /* Board */
-  .board {
-    max-width: 900px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    align-items: start;
-  }
+.add-btn {
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
+}
 
-  @media (max-width: 640px) {
-    .board { grid-template-columns: 1fr; }
-  }
+.add-btn:hover { background: var(--blue-text); box-shadow: 0 1px 4px rgba(26,115,232,.4); }
 
-  .column {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-  }
+/* Board */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  align-items: start;
+}
 
-  .col-header {
-    padding: 14px 16px;
-    border-bottom: 1.5px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+@media (max-width: 700px) { .board { grid-template-columns: 1fr; } }
 
-  .col-title {
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
+.column {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
 
-  .col-badge {
-    font-size: 0.7rem;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-weight: 500;
-  }
+.col-header {
+  padding: 16px 16px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
 
-  [data-col="todo"]     .col-title  { color: var(--todo); }
-  [data-col="todo"]     .col-badge  { background: var(--todo-bg); color: var(--todo); border: 1px solid var(--border); }
-  [data-col="progress"] .col-title  { color: var(--progress); }
-  [data-col="progress"] .col-badge  { background: var(--prog-bg); color: var(--progress); border: 1px solid #E0C4A0; }
-  [data-col="done"]     .col-title  { color: var(--done); }
-  [data-col="done"]     .col-badge  { background: var(--done-bg); color: var(--done); border: 1px solid #B8D8BA; }
+.col-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
 
-  .col-body {
-    padding: 12px;
-    min-height: 120px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
+[data-col="todo"]     .col-dot { background: #9AA0A6; }
+[data-col="progress"] .col-dot { background: var(--orange); }
+[data-col="done"]     .col-dot { background: var(--green); }
 
-  /* Cards */
-  .card {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 12px 14px;
-    position: relative;
-    animation: slideIn 0.18s ease;
-  }
+.col-title {
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  flex: 1;
+  color: var(--on-surface);
+}
 
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+.col-badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  [data-col="done"] .card-text {
-    text-decoration: line-through;
-    color: var(--ink-light);
-  }
+[data-col="todo"]     .col-badge { background: var(--hover);       color: var(--secondary); }
+[data-col="progress"] .col-badge { background: var(--orange-light); color: var(--orange-text); }
+[data-col="done"]     .col-badge { background: var(--green-light);  color: var(--green-text); }
 
-  .card-actions {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    gap: 4px;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
+.col-body {
+  padding: 10px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-  .card:hover .card-actions { opacity: 1; }
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  position: relative;
+  transition: box-shadow 0.15s, border-color 0.15s;
+  animation: fadeUp 0.16s ease;
+}
 
-  .card-btn {
-    width: 22px;
-    height: 22px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--border);
-    color: var(--ink);
-    transition: background 0.12s;
-    flex-shrink: 0;
-  }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-  .card-btn:hover { background: var(--ink); color: var(--bg); }
-  .card-btn.del:hover { background: #C0392B; color: white; }
+.card:hover { box-shadow: var(--shadow-hover); border-color: #DADCE0; }
 
-  /* Move buttons row */
-  .card-moves {
-    display: flex;
-    gap: 4px;
-    margin-top: 8px;
-    flex-wrap: wrap;
-  }
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
 
-  .move-btn {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    padding: 2px 8px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--ink-light);
-    cursor: pointer;
-    letter-spacing: 0.05em;
-    transition: all 0.12s;
-  }
+.pri-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 11px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-top: 1px;
+  padding: 0 5px;
+}
 
-  .move-btn:hover {
-    background: var(--ink);
-    color: var(--bg);
-    border-color: var(--ink);
-  }
+.p-high { background: var(--red-light);    color: var(--red-text); }
+.p-mid  { background: var(--orange-light); color: var(--orange-text); }
+.p-low  { background: var(--hover);        color: var(--secondary); }
 
-  .empty-hint {
-    font-size: 0.72rem;
-    color: var(--ink-light);
-    text-align: center;
-    padding: 16px 0;
-    letter-spacing: 0.06em;
-    opacity: 0.6;
-  }
+.card-text {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--on-surface);
+  flex: 1;
+  word-break: break-word;
+  padding-right: 20px;
+}
+
+[data-col="done"] .card-text { color: var(--secondary); text-decoration: line-through; }
+
+.del-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #9AA0A6;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.12s, background 0.12s, color 0.12s;
+}
+
+.card:hover .del-btn { opacity: 1; }
+.del-btn:hover { background: var(--red-light); color: var(--red); }
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pri-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pri-label {
+  font-size: 0.6875rem;
+  color: #9AA0A6;
+}
+
+.pri-sel {
+  font-family: 'Google Sans Text', sans-serif;
+  font-size: 0.75rem;
+  color: var(--secondary);
+  border: 1px solid var(--border);
+  background: transparent;
+  border-radius: 4px;
+  padding: 2px 4px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.12s;
+}
+
+.pri-sel:hover { border-color: var(--blue); }
+
+.move-chips {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.move-chip {
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--secondary);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  white-space: nowrap;
+}
+
+.move-chip:hover { background: var(--blue-light); border-color: var(--blue); color: var(--blue-text); }
+
+.empty-state {
+  text-align: center;
+  padding: 28px 16px;
+  color: #9AA0A6;
+}
+
+.empty-state svg { width: 28px; height: 28px; margin-bottom: 8px; opacity: 0.4; display: block; margin-left: auto; margin-right: auto; }
+.empty-state p { font-size: 0.8125rem; }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Mis Tareas</h1>
-  <span class="task-count" id="task-count">0 tareas</span>
-</header>
-
-<form class="add-form" onsubmit="addTask(event)">
-  <input id="new-task" type="text" placeholder="Escribe una tarea nueva..." autocomplete="off">
-  <select id="new-priority" class="priority-select" title="Prioridad (10 = más urgente)">
-    <option value="5">P5</option>
-    <option value="10">P10</option>
-    <option value="9">P9</option>
-    <option value="8">P8</option>
-    <option value="7">P7</option>
-    <option value="6">P6</option>
-    <option value="4">P4</option>
-    <option value="3">P3</option>
-    <option value="2">P2</option>
-    <option value="1">P1</option>
-  </select>
-  <button type="submit">+ Agregar</button>
-</form>
-
-<div class="board">
-  <div class="column" data-col="todo">
-    <div class="col-header">
-      <span class="col-title">Por hacer</span>
-      <span class="col-badge" id="badge-todo">0</span>
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="app-icon">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
     </div>
-    <div class="col-body" id="col-todo"></div>
+    <h1>Mis Tareas</h1>
   </div>
+  <span class="task-count" id="task-count">Sin tareas</span>
+</div>
 
-  <div class="column" data-col="progress">
-    <div class="col-header">
-      <span class="col-title">En progreso</span>
-      <span class="col-badge" id="badge-progress">0</span>
-    </div>
-    <div class="col-body" id="col-progress"></div>
-  </div>
+<div class="main">
+  <form class="add-form" onsubmit="addTask(event)">
+    <input id="new-task" type="text" placeholder="Agregar una tarea..." autocomplete="off">
+    <div class="form-divider"></div>
+    <select id="new-priority" class="priority-select" title="Prioridad (10 = más urgente)">
+      <option value="5">P5</option>
+      <option value="10">P10</option>
+      <option value="9">P9</option>
+      <option value="8">P8</option>
+      <option value="7">P7</option>
+      <option value="6">P6</option>
+      <option value="4">P4</option>
+      <option value="3">P3</option>
+      <option value="2">P2</option>
+      <option value="1">P1</option>
+    </select>
+    <button type="submit" class="add-btn">Agregar</button>
+  </form>
 
-  <div class="column" data-col="done">
-    <div class="col-header">
-      <span class="col-title">Hecho</span>
-      <span class="col-badge" id="badge-done">0</span>
+  <div class="board">
+    <div class="column" data-col="todo">
+      <div class="col-header">
+        <span class="col-dot"></span>
+        <span class="col-title">Por hacer</span>
+        <span class="col-badge" id="badge-todo">0</span>
+      </div>
+      <div class="col-body" id="col-todo"></div>
     </div>
-    <div class="col-body" id="col-done"></div>
+
+    <div class="column" data-col="progress">
+      <div class="col-header">
+        <span class="col-dot"></span>
+        <span class="col-title">En progreso</span>
+        <span class="col-badge" id="badge-progress">0</span>
+      </div>
+      <div class="col-body" id="col-progress"></div>
+    </div>
+
+    <div class="column" data-col="done">
+      <div class="col-header">
+        <span class="col-dot"></span>
+        <span class="col-title">Hecho</span>
+        <span class="col-badge" id="badge-done">0</span>
+      </div>
+      <div class="col-body" id="col-done"></div>
+    </div>
   </div>
 </div>
 
@@ -373,8 +441,8 @@ const COLS   = ['todo', 'progress', 'done'];
 const LABELS = { todo: 'Por hacer', progress: 'En progreso', done: 'Hecho' };
 const NEXT   = { todo: ['progress', 'done'], progress: ['todo', 'done'], done: ['todo', 'progress'] };
 
-function load()   { try { return JSON.parse(localStorage.getItem('tasks') || '[]'); } catch { return []; } }
-function save(t)  { localStorage.setItem('tasks', JSON.stringify(t)); }
+function load()  { try { return JSON.parse(localStorage.getItem('tasks') || '[]'); } catch { return []; } }
+function save(t) { localStorage.setItem('tasks', JSON.stringify(t)); }
 
 function pipClass(p) {
   if (p >= 8) return 'p-high';
@@ -383,13 +451,14 @@ function pipClass(p) {
 }
 
 function sortItems(items, col) {
-  // Done column: lower priority first (least important on top, already done)
-  // Todo & progress: higher priority first
   return [...items].sort((a, b) => {
-    const pa = a.priority ?? 5;
-    const pb = b.priority ?? 5;
+    const pa = a.priority ?? 5, pb = b.priority ?? 5;
     return col === 'done' ? pa - pb : pb - pa;
   });
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function render() {
@@ -397,54 +466,55 @@ function render() {
   COLS.forEach(col => {
     const body  = document.getElementById('col-' + col);
     const badge = document.getElementById('badge-' + col);
-    const raw   = tasks.filter(t => t.col === col);
-    const items = sortItems(raw, col);
+    const items = sortItems(tasks.filter(t => t.col === col), col);
     badge.textContent = items.length;
     body.innerHTML = '';
     if (!items.length) {
-      body.innerHTML = '<p class="empty-hint">— vacío —</p>';
+      body.innerHTML = `<div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="3"/>
+          <path d="M8 12h8M8 8h5M8 16h3"/>
+        </svg>
+        <p>Sin tareas</p>
+      </div>`;
       return;
     }
     items.forEach(task => {
-      const p    = task.priority ?? 5;
+      const p = task.priority ?? 5;
       const card = document.createElement('div');
       card.className = 'card';
       const moves = NEXT[col].map(dest =>
-        `<button class="move-btn" onclick="moveTask('${task.id}','${dest}')">→ ${LABELS[dest]}</button>`
+        `<button class="move-chip" onclick="moveTask('${task.id}','${dest}')">→ ${LABELS[dest]}</button>`
       ).join('');
       const opts = Array.from({length:10},(_,i)=>10-i).map(n =>
         `<option value="${n}" ${n===p?'selected':''}>${n}</option>`
       ).join('');
       card.innerHTML = `
         <div class="card-top">
-          <span class="priority-pip ${pipClass(p)}">${p}</span>
+          <span class="pri-chip ${pipClass(p)}">${p}</span>
           <div class="card-text">${esc(task.text)}</div>
         </div>
-        <div class="card-actions">
-          <button class="card-btn del" onclick="deleteTask('${task.id}')" title="Eliminar">✕</button>
-        </div>
-        <div class="pri-change">
-          <label>PRIORIDAD</label>
-          <select onchange="changePriority('${task.id}', this.value)">${opts}</select>
-        </div>
-        <div class="card-moves">${moves}</div>`;
+        <button class="del-btn" onclick="deleteTask('${task.id}')" title="Eliminar">✕</button>
+        <div class="card-footer">
+          <div class="pri-row">
+            <span class="pri-label">Prioridad</span>
+            <select class="pri-sel" onchange="changePriority('${task.id}', this.value)">${opts}</select>
+          </div>
+          <div class="move-chips">${moves}</div>
+        </div>`;
       body.appendChild(card);
     });
   });
   const total = tasks.length;
   document.getElementById('task-count').textContent =
-    total === 0 ? 'sin tareas' : total === 1 ? '1 tarea' : total + ' tareas';
-}
-
-function esc(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    total === 0 ? 'Sin tareas' : total === 1 ? '1 tarea' : total + ' tareas';
 }
 
 function addTask(e) {
   e.preventDefault();
-  const input    = document.getElementById('new-task');
-  const priSel   = document.getElementById('new-priority');
-  const text     = input.value.trim();
+  const input  = document.getElementById('new-task');
+  const priSel = document.getElementById('new-priority');
+  const text   = input.value.trim();
   if (!text) return;
   const tasks = load();
   tasks.push({ id: Date.now().toString(), text, col: 'todo', priority: parseInt(priSel.value) });
@@ -461,8 +531,7 @@ function moveTask(id, dest) {
 }
 
 function deleteTask(id) {
-  const tasks = load().filter(x => x.id !== id);
-  save(tasks);
+  save(load().filter(x => x.id !== id));
   render();
 }
 
