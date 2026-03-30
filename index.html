@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis Tareas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #F5F2EB;
+    --surface:   #FDFBF7;
+    --ink:       #1A1714;
+    --ink-light: #6B6560;
+    --border:    #D8D2C8;
+    --todo:      #1A1714;
+    --progress:  #9B5E28;
+    --done:      #3A6B3E;
+    --todo-bg:   #F0EDE6;
+    --prog-bg:   #FBF0E6;
+    --done-bg:   #EAF2EB;
+    --accent:    #C4742A;
+  }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+  }
+
+  header {
+    max-width: 900px;
+    margin: 0 auto 48px;
+    border-bottom: 1.5px solid var(--ink);
+    padding-bottom: 20px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .task-count {
+    font-size: 0.75rem;
+    color: var(--ink-light);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Input */
+  .add-form {
+    max-width: 900px;
+    margin: 0 auto 48px;
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .add-form input {
+    flex: 1;
+    padding: 12px 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .add-form input:focus { border-color: var(--ink); }
+  .add-form input::placeholder { color: var(--ink-light); }
+
+  .add-form button {
+    padding: 12px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 500;
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+    transition: opacity 0.15s;
+  }
+
+  .add-form button:hover { opacity: 0.8; }
+
+  /* Board */
+  .board {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+
+  @media (max-width: 640px) {
+    .board { grid-template-columns: 1fr; }
+  }
+
+  .column {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .col-header {
+    padding: 14px 16px;
+    border-bottom: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .col-title {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .col-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  [data-col="todo"]     .col-title  { color: var(--todo); }
+  [data-col="todo"]     .col-badge  { background: var(--todo-bg); color: var(--todo); border: 1px solid var(--border); }
+  [data-col="progress"] .col-title  { color: var(--progress); }
+  [data-col="progress"] .col-badge  { background: var(--prog-bg); color: var(--progress); border: 1px solid #E0C4A0; }
+  [data-col="done"]     .col-title  { color: var(--done); }
+  [data-col="done"]     .col-badge  { background: var(--done-bg); color: var(--done); border: 1px solid #B8D8BA; }
+
+  .col-body {
+    padding: 12px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 14px;
+    position: relative;
+    animation: slideIn 0.18s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-text {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--ink);
+    padding-right: 24px;
+    word-break: break-word;
+  }
+
+  [data-col="done"] .card-text {
+    text-decoration: line-through;
+    color: var(--ink-light);
+  }
+
+  .card-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .card:hover .card-actions { opacity: 1; }
+
+  .card-btn {
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--border);
+    color: var(--ink);
+    transition: background 0.12s;
+    flex-shrink: 0;
+  }
+
+  .card-btn:hover { background: var(--ink); color: var(--bg); }
+  .card-btn.del:hover { background: #C0392B; color: white; }
+
+  /* Move buttons row */
+  .card-moves {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+
+  .move-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--ink-light);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.12s;
+  }
+
+  .move-btn:hover {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+
+  .empty-hint {
+    font-size: 0.72rem;
+    color: var(--ink-light);
+    text-align: center;
+    padding: 16px 0;
+    letter-spacing: 0.06em;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Mis Tareas</h1>
+  <span class="task-count" id="task-count">0 tareas</span>
+</header>
+
+<form class="add-form" onsubmit="addTask(event)">
+  <input id="new-task" type="text" placeholder="Escribe una tarea nueva..." autocomplete="off">
+  <button type="submit">+ Agregar</button>
+</form>
+
+<div class="board">
+  <div class="column" data-col="todo">
+    <div class="col-header">
+      <span class="col-title">Por hacer</span>
+      <span class="col-badge" id="badge-todo">0</span>
+    </div>
+    <div class="col-body" id="col-todo"></div>
+  </div>
+
+  <div class="column" data-col="progress">
+    <div class="col-header">
+      <span class="col-title">En progreso</span>
+      <span class="col-badge" id="badge-progress">0</span>
+    </div>
+    <div class="col-body" id="col-progress"></div>
+  </div>
+
+  <div class="column" data-col="done">
+    <div class="col-header">
+      <span class="col-title">Hecho</span>
+      <span class="col-badge" id="badge-done">0</span>
+    </div>
+    <div class="col-body" id="col-done"></div>
+  </div>
+</div>
+
+<script>
+const COLS   = ['todo', 'progress', 'done'];
+const LABELS = { todo: 'Por hacer', progress: 'En progreso', done: 'Hecho' };
+const NEXT   = { todo: ['progress', 'done'], progress: ['todo', 'done'], done: ['todo', 'progress'] };
+
+function load()   { try { return JSON.parse(localStorage.getItem('tasks') || '[]'); } catch { return []; } }
+function save(t)  { localStorage.setItem('tasks', JSON.stringify(t)); }
+
+function render() {
+  const tasks = load();
+  COLS.forEach(col => {
+    const body  = document.getElementById('col-' + col);
+    const badge = document.getElementById('badge-' + col);
+    const items = tasks.filter(t => t.col === col);
+    badge.textContent = items.length;
+    body.innerHTML = '';
+    if (!items.length) {
+      body.innerHTML = '<p class="empty-hint">— vacío —</p>';
+      return;
+    }
+    items.forEach(task => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const moves = NEXT[col].map(dest =>
+        `<button class="move-btn" onclick="moveTask('${task.id}','${dest}')">→ ${LABELS[dest]}</button>`
+      ).join('');
+      card.innerHTML = `
+        <div class="card-text">${esc(task.text)}</div>
+        <div class="card-actions">
+          <button class="card-btn del" onclick="deleteTask('${task.id}')" title="Eliminar">✕</button>
+        </div>
+        <div class="card-moves">${moves}</div>`;
+      body.appendChild(card);
+    });
+  });
+  const total = tasks.length;
+  document.getElementById('task-count').textContent =
+    total === 0 ? 'sin tareas' : total === 1 ? '1 tarea' : total + ' tareas';
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function addTask(e) {
+  e.preventDefault();
+  const input = document.getElementById('new-task');
+  const text  = input.value.trim();
+  if (!text) return;
+  const tasks = load();
+  tasks.push({ id: Date.now().toString(), text, col: 'todo' });
+  save(tasks);
+  input.value = '';
+  render();
+}
+
+function moveTask(id, dest) {
+  const tasks = load();
+  const t = tasks.find(x => x.id === id);
+  if (t) { t.col = dest; save(tasks); render(); }
+}
+
+function deleteTask(id) {
+  const tasks = load().filter(x => x.id !== id);
+  save(tasks);
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
